@@ -3,7 +3,7 @@
 const cors = require('cors');
 
 const corsConfig = cors({
-  origin: 'intvfrontendvercel.vercel.app', // your frontend URL
+  origin: 'https://intvfrontendvercel.vercel.app/', // your frontend URL
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH', 'OPTIONS'], // optional, for extra clarity
 });
