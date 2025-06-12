@@ -23,7 +23,7 @@ router.post('/create', auth, async (req, res) => {
     }
 
     const { v4: uuidv4 } = require('uuid');
-    const joinLink = `http://localhost:5173/join-interview/${uuidv4()}`;
+    const joinLink = `https://intvfrontendvercel.vercel.app/join-interview/${uuidv4()}`;
 
     const interview = await Interview.create({
       interviewerId,
