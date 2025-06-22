@@ -19,26 +19,23 @@ const Interview = require('../models/Interview');
 // const upload = multer({ storage });
 
 // Upload Resume
-router.post('/upload-resume', authMiddleware, upload.single('resume'), async (req, res) => {
+router.put('/update-resume-link', authMiddleware, async (req, res) => {
   try {
-    const id = req.user.id; // fixed here
-
-    const resumeUrl = `/uploads/resumes/${req.file.filename}`;
-    let profile = await CandidateProfile.findOne({ userId: id });
-
+    const { resumeUrl } = req.body;
+    const userId = req.user.id;
+    let profile = await CandidateProfile.findOne({ userId });
     if (!profile) {
-      profile = await CandidateProfile.create({ userId: id, resumeUrl });
+      profile = await CandidateProfile.create({ userId, resumeUrl });
     } else {
       profile.resumeUrl = resumeUrl;
       await profile.save();
     }
-    await User.findByIdAndUpdate(id, { resumeUrl });
-
-    res.json({ message: 'Resume uploaded successfully', resumeUrl });
+    await User.findByIdAndUpdate(userId, { resumeUrl });
+    res.json({ message: 'Resume link updated successfully', resumeUrl });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to upload resume' });
+    res.status(500).json({ error: 'Failed to update resume link' });
   }
-});   
+});
 
 // Update Candidate Info
 router.put('/update-info', authMiddleware, async (req, res) => {
@@ -94,29 +91,7 @@ const userId = req.user.id || req.user._id;
     res.status(500).json({ error: 'Failed to load candidate dashboard' });
   }
 });
-// In your routes/candidate.js
-router.delete('/delete-resume', authMiddleware, async (req, res) => {
-  try {
-    const candidate = await CandidateProfile.findOne({ userId: req.user.id });
-        console.log('CandidateProfile found:', candidate);
 
-    if (candidate && candidate.resumeUrl) {
-      const filePath = path.join(__dirname, '..', candidate.resumeUrl); 
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath); // Delete the file
-      }
-      candidate.resumeUrl = '';
-      await candidate.save();
-
-      res.status(200).json({ message: 'Resume deleted successfully' });
-    } else {
-      res.status(400).json({ message: 'No resume to delete' });
-    }
-  } catch (err) {
-    console.error('Error deleting resume:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Failed to delete resume' });
-  }
-});
 router.get('/my-interviews', authMiddleware, async (req, res) => {
   try {
     const candidateId = req.user.id;
